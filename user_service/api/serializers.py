@@ -1,58 +1,71 @@
+import re
 from rest_framework import serializers
 from users.models import CustomUser 
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth import authenticate
 
 class UserRegistrasiSerializer(serializers.ModelSerializer):
-    sponsor_id = serializers.UUIDField(write_only=True, required=False)
-    password = serializers.CharField(write_only=True, required=True)
-    
+    # Menggunakan field yang jelas untuk username sponsor
+    sponsor_username = serializers.CharField(
+        write_only=True, 
+        required=False, 
+        allow_blank=True,
+        max_length=255
+    )
+
+    password = serializers.CharField(
+        write_only=True, 
+        required=True, 
+        min_length=8,
+        error_messages={'min_length': 'Password minimal harus 8 karakter.'}
+    )
+
+    ktp = serializers.CharField(
+        required=True, 
+        max_length=16, 
+        
+        error_messages={'min_length': 'Nomor KTP harus 16 digit.', 'max_length': 'Nomor KTP harus 16 digit.'}
+    )
+
     class Meta:
         model = CustomUser
         fields = [
-            'username', 'sponsor_id', 'password', 'name', 'email',
-            'phone_number', 'ktp', 'address', 'province', 'city', 
-            'district', 'postal_code', 'level_status'
+            'username', 'sponsor_username', 'name', 'email', 'password', 'first_name', 'last_name',
+            'phone_number', 'ktp', 'address', 'province', 'city', 'district',
+            'postal_code'
         ]
-        read_only_fields = ['id']
         extra_kwargs = {
-            'email': {'required': False, 'allow_blank': True},
-            'phone_number': {'required': False, 'allow_blank': True},
-            'ktp': {'required': False, 'allow_blank': True},
-            'name': {'required': False, 'allow_blank': True},
+            'username': {
+                'validators': [],  # Hapus validator default jika Anda punya
+                'required': True
+            },
+            'level_status': {'read_only': True}
         }
     
-    
-    
-    def validate_username(self, value):
-        """Validasi username unique"""
-        if CustomUser.objects.filter(username=value).exists():
-            raise serializers.ValidationError("Username sudah digunakan")
+    # Validator untuk sponsor_username
+    def validate_sponsor_username(self, value):
+        if value:
+            if not CustomUser.objects.filter(username=value).exists():
+                raise serializers.ValidationError("Username sponsor tidak ditemukan.")
         return value
-    
 
-    
-    
+    # Validator untuk username (user baru)
+    def validate_username(self, value):
+        if len(value) < 3:
+            raise serializers.ValidationError("Username minimal 3 karakter.")
+        
+        if not re.match(r'^[a-zA-Z0-9_]+$', value):
+            raise serializers.ValidationError("Username hanya boleh mengandung huruf, angka, dan underscore (_).")
+            
+        if CustomUser.objects.filter(username=value).exists():
+            raise serializers.ValidationError("Username sudah digunakan.")
+        
+        return value
+
     def create(self, validated_data):
-        # Handle sponsor_id
-        sponsor_id = validated_data.pop('sponsor_id', None)
         password = validated_data.pop('password')
         
-        # Get sponsor object if sponsor_id provided
-        sponsor = None
-        if sponsor_id:
-            try:
-                sponsor = CustomUser.objects.get(id=sponsor_id)
-            except CustomUser.DoesNotExist:
-                raise serializers.ValidationError({"sponsor_id": "Sponsor tidak ditemukan"})
-        
-        # Create user
-        user = CustomUser.objects.create(
-            sponsor_id=sponsor,
-            **validated_data
-        )
-        
-        # Set password properly
+        user = CustomUser.objects.create_user(**validated_data)
         user.set_password(password)
         user.save()
         

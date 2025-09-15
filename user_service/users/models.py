@@ -11,14 +11,8 @@ class CustomUser(AbstractUser):
     
     id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
     username = models.CharField(max_length=255, unique=True, null=True, blank=True)
-    sponsor_id = models.ForeignKey(
-        'self', 
-        on_delete=models.SET_NULL, 
-        null=True, 
-        blank=True,
-        related_name='referred_users',
-        db_column='sponsor_id'
-    )
+    sponsor_username = models.CharField(max_length=255, unique=False, null=False, blank=False)
+   
     name = models.CharField(max_length=255, blank=True, null=True)
     phone_number = models.CharField(max_length=16, blank=True, null=True)
     ktp = models.CharField(max_length=16, blank=True, null=True)

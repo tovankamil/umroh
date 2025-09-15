@@ -27,7 +27,7 @@ class CustomPagination(PageNumberPagination):
         })
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def userlist(request):    
     
             users = CustomUser.objects.filter(is_superuser=False)
@@ -86,37 +86,42 @@ def userlist(request):
     #                     'sponsor_id': sponsor_user.id
     #                 }, status_code=status.HTTP_201_CREATED,message="User succesfully created")
     #             except CustomUser.DoesNotExist:
-    #                 return error_response(message= 'Sponsor not found', status=400)  
+    #                 return error_response(message= 'Sponsor not found', status_code=400)  
                 
         
-    #     return error_response(message= serializer.errors, status=400)
+    #     return error_response(message= serializer.errors, status_code=400)
    
    
 # Registrasi 
 
 @api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def Registrasi(request, username):
-    serializer = UserRegistrasiSerializer(data=request.data)
-      
-    if serializer.is_valid():
-        # Mendapatkan username sponsor dari request data
-        sponsor_username = request.data.get('sponsor_id')           
-         
-        if sponsor_username:
-                try:
-                    # Mencari pengguna sponsor berdasarkan username
-                    sponsor_user = CustomUser.objects.get(id=sponsor_username)
-                    savedata = serializer.save()  
-                    return success_response(data={
+@permission_classes([AllowAny])
+def Registrasi(request):
+    serializer = UserRegistrasiSerializer(data=request.data)      
+ 
+    try:
+        if serializer.is_valid():     
+            savedata = serializer.save()  
+            return success_response(data={
                         'user_id': savedata.id,
-                        'sponsor_id': sponsor_user.id
+                        'sponsor_username': savedata.sponsor_username if savedata.sponsor_username else None
                     }, status_code=status.HTTP_201_CREATED,message="User succesfully created")
-                except CustomUser.DoesNotExist:
-                    return error_response(message= 'Sponsor not found', status=status.HTTP_400_BAD_REQUEST)  
+        else:
+  
+            error_messages = []
+            for field, errors in serializer.errors.items():
+                for error in errors:              
+                    error_messages.append(f"{field}: {error}")
+            
+            # Mengembalikan respons dengan pesan-pesan tersebut
+            return Response({
+                "message": "Validasi gagal.",
+                "errors": error_messages
+            }, status=status.HTTP_400_BAD_REQUEST)
+    except CustomUser.DoesNotExist:
+         return error_response(message= 'Unknown erro',data='', status_code=status.HTTP_400_BAD_REQUEST)  
                 
-        
-        return error_response(message= serializer.errors, status=status.HTTP_400_BAD_REQUEST)    
+       
     
     
 @api_view(['GET', 'PUT', 'DELETE'])
@@ -126,7 +131,7 @@ def user_details(request, username):
         user = request.user 
           
     except CustomUser.DoesNotExist:
-        return Response({'error': 'User not found'}, status=404)
+        return Response({'error': 'User not found'}, status_code=404)
     
     if request.method == 'GET':
         serializer = UserRegistrasiSerializer(user)
@@ -148,7 +153,7 @@ def user_details(request, username):
     elif request.method == 'DELETE':
         try:
              user.delete()
-             return Response({'message': 'User deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
+             return Response({'message': 'User deleted successfully'}, status_code=status.HTTP_204_NO_CONTENT)
         except Exception as e:
             return error_response(
                 message=f'Failed to update user: {str(e)}',
@@ -177,7 +182,7 @@ def login_view(request):
                     'user_id': user.id,
                     'username': user.username,
                     'email': user.email,
-                    'is_superuser': user.is_superuser
+                  
                 },
                 message="Login successful",
                 status_code=status.HTTP_200_OK
