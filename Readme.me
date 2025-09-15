@@ -1,0 +1,19 @@
+python -m venv venv
+
+
+
+venv\Scripts\activate.bat
+
+pip install django djangorestframework psycopg2-binary redis celery django-celery-results django-redis
+
+django-admin startproject products
+
+#create module
+python manage.py startapp bank
+python manage.py startapp sponsorships
+
+python manage.py makemigrations
+python manage.py migrate
+
+#create password superuser
+python manage.py createsuperuser

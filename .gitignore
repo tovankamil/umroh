@@ -1,0 +1,37 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+lib/
+lib64/
+bin/
+.env
+.venv
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Django
+*.log
+*.sqlite3
+db.sqlite3
+local_settings.py
+media/
+
+# IDE
+.idea/
+.vscode/
+.DS_Store
+
+# Virtual Environment
+# Direktori ini berisi dependensi proyek Anda.
+# Sangat penting untuk tidak mengunggahnya.
+# Cukup bagikan file requirements.txt
+/env
+/venv
+
+# OS
+Thumbs.db
