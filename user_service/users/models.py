@@ -10,9 +10,7 @@ class CustomUser(AbstractUser):
         DIRECTOR = 'DRC', 'Director'
     
     id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
-    username = models.CharField(max_length=255, unique=True, null=True, blank=True)
-    sponsor_username = models.CharField(max_length=255, unique=False, null=False, blank=False)
-   
+    username = models.CharField(max_length=255, unique=True, null=True, blank=True)  
     name = models.CharField(max_length=255, blank=True, null=True)
     phone_number = models.CharField(max_length=16, blank=True, null=True)
     ktp = models.CharField(max_length=16, blank=True, null=True)
@@ -21,6 +19,7 @@ class CustomUser(AbstractUser):
     city = models.CharField(max_length=100, blank=True, null=True)  
     district = models.CharField(max_length=100, blank=True, null=True)
     postal_code = models.CharField(max_length=10, blank=True, null=True)
+    ahliwaris = models.CharField(max_length=255, blank=True, null=True)
     level_status = models.CharField(
         max_length=3,
         choices=LevelStatus.choices,
