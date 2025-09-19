@@ -79,7 +79,7 @@ def create_user_task(user_data):
                     # Tidak perlu rollback, sponsorship opsional
         
         logger.info(f"User {user.username} berhasil dibuat melalui Celery (ID: {user.id})")
-        SponsorshipQuerySet(m
+  
         return {
             'status': 'success', 
             'username': user.username,
@@ -104,36 +104,40 @@ def create_user_task(user_data):
         
         return {'status': 'error', 'message': 'Terjadi kesalahan sistem saat membuat user'}
 
-class SponsorshipQuerySet(models.QuerySet):
-    def with_upline(self, user_id):
-        query = """WITH RECURSIVE user_upline AS (
-    -- Bagian Jangkar: Mulai dari baris pengguna yang kamu pilih.
-    SELECT
-        id,
-        user_id,
-        sponsor_id,
-        0 AS level
-    FROM
-        sponsorships_sponsorship
-    WHERE
-        user_id = '81b028bd-01a3-45a0-b7fe-0ee862199024' -- Ganti dengan user_id yang kamu cari
-    
-    UNION ALL
-    
-    -- Bagian Rekursif: Cari sponsor sebelumnya dengan mencocokkan sponsor_id dengan user_id.
-    SELECT
-        t.id,
-        t.user_id,
-        t.sponsor_id,
-        h.level + 1
-    FROM
-        sponsorships_sponsorship t
-    JOIN
-        user_upline h ON h.sponsor_id = t.user_id
-    WHERE
-        h.sponsor_id IS NOT NULL
-		  AND h.level < 2
-)
--- Akhirnya, pilih semua hasil dari CTE rekursif.
-SELECT * FROM user_upline;""" # Gunakan kueri yang sama seperti di atas
-        return self.raw(query, [user_id])
+# class SponsorshipQuerySet(models.QuerySet):
+#     def with_upline(self, user_id):
+#         # Kueri rekursif Anda
+#         query = """
+#         WITH RECURSIVE user_upline AS (
+#             -- Bagian Jangkar
+#             SELECT
+#                 id,
+#                 user_id,
+#                 sponsor_id,
+#                 0 AS level
+#             FROM
+#                 sponsorships_sponsorship
+#             WHERE
+#                 user_id = %s
+            
+#             UNION ALL
+            
+#             -- Bagian Rekursif
+#             SELECT
+#                 t.id,
+#                 t.user_id,
+#                 t.sponsor_id,
+#                 h.level + 1
+#             FROM
+#                 sponsorships_sponsorship t
+#             JOIN
+#                 user_upline h ON h.sponsor_id = t.user_id
+#             WHERE
+#                 h.sponsor_id IS NOT NULL
+#                 AND h.level < 2
+#         )
+#         SELECT * FROM user_upline;
+#         """
+        
+#         # Menggunakan .raw() untuk menjalankan kueri SQL mentah
+#         return self.raw(query, [user_id])

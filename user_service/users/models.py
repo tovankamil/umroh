@@ -6,8 +6,9 @@ from django.contrib.auth.models import AbstractUser
 class CustomUser(AbstractUser):
     class LevelStatus(models.TextChoices):
         AGENT = 'AGA', 'Agent'
-        SUPERVISOR = 'SPV', 'Supervisor'
-        DIRECTOR = 'DRC', 'Director'
+        SUPERVISOR = 'SPP', 'Senior Supervisor'
+        MANAGER = 'SM', 'Senior Manager'
+        DIRECTOR = 'SD', 'Senior Director'
     
     id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
     username = models.CharField(max_length=255, unique=True, null=True, blank=True)  
