@@ -17,3 +17,12 @@ python manage.py migrate
 
 #create password superuser
 python manage.py createsuperuser
+celery -A userservice worker --loglevel=debug  --logfile=celery.log  --concurrency=2
+
+#command for checking rabbitmq and redis connection
+python -m celery -A userservice inspect ping
+
+#run celery
+ celery -A userservice worker --loglevel=info 
+# troubleshooting celery
+python -m celery -A userservice worker --loglevel=info --logfile=celery.log --pool=solo

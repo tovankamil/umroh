@@ -1,5 +1,5 @@
 from django.urls import path
-from api.views import userlist, user_details,login_view,logout_view,refresh_token_view,not_found,Registrasi
+from users.views import userlist, user_details,login_view,logout_view,refresh_token_view,not_found,Registrasi
 from rest_framework_simplejwt.views import TokenVerifyView
 
 urlpatterns = [
