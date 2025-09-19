@@ -94,7 +94,7 @@ def Registrasi(request):
         if serializer.is_valid():
             # Convert OrderedDict to a standard dictionary
             task_data = dict(serializer.validated_data) 
-            
+           
             # Pass the standard dictionary to the task
             task = create_user_task.delay(task_data)
 

@@ -21,18 +21,19 @@ class UserRegistrasiSerializer(serializers.ModelSerializer):
         min_length=8,
         error_messages={'min_length': 'Password minimal harus 8 karakter.'}
     )
-    ktp = serializers.CharField(
-        required=True, 
-        max_length=16,
-  
-        error_messages={'min_length': 'Nomor KTP harus 16 digit.', 'max_length': 'Nomor KTP harus 16 digit.'}
-    )
+    # ktp = serializers.CharField(
+   
+    #     max_length=16,
+    #     error_messages={
+    #         'max_length': 'Nomor KTP harus 16 digit.',
+    #     }
+    # )
 
     class Meta:
         model = CustomUser
         fields = [
             'username', 'name', 'email', 'password', 'first_name', 'last_name',
-            'phone_number', 'ktp', 'address', 'province', 'city', 'district',
+            'phone_number', 'ktp', 'address', 'province', 'city', 'district','ahliwaris',
             'postal_code', 'sponsor_username'
         ]
         extra_kwargs = {
@@ -46,10 +47,10 @@ class UserRegistrasiSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError("Username sponsor tidak ditemukan.")
         return value
 
-    def validate_ktp(self, value):
-        if not value.isdigit():
-            raise serializers.ValidationError("Nomor KTP hanya boleh terdiri dari angka.")
-        return value
+    # def validate_ktp(self, value):
+    #     if not value.isdigit():
+    #         raise serializers.ValidationError("Nomor KTP hanya boleh terdiri dari angka.")
+    #     return value
 
     def validate_username(self, value):
         if len(value) < 3:
@@ -60,19 +61,19 @@ class UserRegistrasiSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Username sudah digunakan.")
         return value
 
-    def create(self, validated_data):
-        password = validated_data.pop('password')
-        sponsor_username = validated_data.pop('sponsor_username', None)
+    # def create(self, validated_data):
+    #     password = validated_data.pop('password')
+    #     sponsor_username = validated_data.pop('sponsor_username', None)
 
-        with transaction.atomic():
-            user = CustomUser.objects.create_user(**validated_data)
-            user.set_password(password)
-            user.save()
+    #     with transaction.atomic():
+    #         user = CustomUser.objects.create_user(**validated_data)
+    #         user.set_password(password)
+    #         user.save()
 
-            if sponsor_username:
-                sponsor = CustomUser.objects.get(username=sponsor_username)
-                Sponsorship.objects.create(user=user, sponsor=sponsor)
-        return user
+    #         if sponsor_username:
+    #             sponsor = CustomUser.objects.get(username=sponsor_username)
+    #             Sponsorship.objects.create(user=user, sponsor=sponsor)
+    #     return user
 
 class UserUpdateSerializer(serializers.ModelSerializer):
         password = serializers.CharField(write_only=True, required=False, allow_blank=True)
