@@ -2,7 +2,7 @@
 import uuid
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-
+from django.db.models import Sum, Case, When, IntegerField
 class CustomUser(AbstractUser):
     class LevelStatus(models.TextChoices):
         AGENT = 'AGA', 'Agent'
@@ -26,6 +26,23 @@ class CustomUser(AbstractUser):
         choices=LevelStatus.choices,
         default=LevelStatus.AGENT
     )
+
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    def current_balance(self):   
+        result = self.wallet_transactions.aggregate(
+            total_balance=Sum(
+                Case(
+                    When(type_transaction='CREDIT', then='amount'),
+                    When(type_transaction='DEBIT', then=-models.F('amount')),
+                    default=0,
+                    output_field=IntegerField()
+                )
+            )
+        )
+        return result['total_balance'] or 0
 
     def __str__(self):
         return self.username or f"User ID: {self.id}"

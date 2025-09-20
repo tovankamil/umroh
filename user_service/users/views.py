@@ -15,6 +15,7 @@ from utils.utils import success_response, error_response
 from users.models import CustomUser
 from sponsorships.models import Sponsorship 
 from sponsorships.serializers import SponsorshipSerializer
+from sponsorships.services.sponsorship_service import SponsorshipService
 
 logger = logging.getLogger(__name__)
 
@@ -93,15 +94,18 @@ def Registrasi(request):
         serializer = UserRegistrasiSerializer(data=request.data)
         if serializer.is_valid():
             # Convert OrderedDict to a standard dictionary
-            task_data = dict(serializer.validated_data) 
-           
+           # task_data = dict(serializer.validated_data) 
+            sponsor = CustomUser.objects.get(username=request.data.get('sponsor_username'))
+            upline_data = SponsorshipService.get_upline_with_bonus_cached(str(sponsor.id), max_level=3)
+      
             # Pass the standard dictionary to the task
-            task = create_user_task.delay(task_data)
+            #task = create_user_task.delay(task_data)
 
             return success_response(
                 data={
                     'message': 'Registrasi sedang diproses secara asynchronous',
-                    'task_id': task.id
+                    # 'task_id': task.id,
+                    'upline': upline_data
                 },
                 status_code=status.HTTP_201_CREATED,
                 message="User successfully created"
