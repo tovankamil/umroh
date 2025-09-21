@@ -139,45 +139,30 @@ Application Modules
         REST API endpoints
 
 API versioning
-
 Documentation
-
 Key Dependencies
-Django: Web framework
-
-Django REST Framework: API development
-
-Celery: Asynchronous task queue
-
-Redis: Message broker and caching
-
-PostgreSQL: Database
-
-Psycopg2: PostgreSQL adapter
-
-Django Redis: Redis cache backend
-
-Django Celery Results: Celery result backend
+    Django: Web framework
+    Django REST Framework: API development
+    Celery: Asynchronous task queue
+    Redis: Message broker and caching
+    PostgreSQL: Database
+    Psycopg2: PostgreSQL adapter
+    Django Redis: Redis cache backend
+    Django Celery Results: Celery result backend
 
 Troubleshooting
 Common Issues
 Celery connection issues:
-
-Ensure Redis is running: redis-server
-
-Check broker URL configuration
+    -Ensure Redis is running: redis-server
+    -Check broker URL configuration
 
 Database connection issues:
-
-Verify PostgreSQL is running
-
-Check database credentials in settings
+    -Verify PostgreSQL is running
+    -Check database credentials in settings
 
 Module import errors:
-
-Ensure virtual environment is activated
-
-Verify all dependencies are installed
+    -Ensure virtual environment is activated
+    -Verify all dependencies are installed
 
 
 Windows-specific Celery Setup
@@ -186,17 +171,12 @@ On Windows, use the solo pool:
 python -m celery -A userservice worker --loglevel=info --logfile=celery.log --pool=solo
 
 Development Workflow
-Activate virtual environment
-
-Install new dependencies: pip install <package>
-
-Update requirements: pip freeze > requirements.txt
-
-Run migrations after model changes
-
-Test endpoints using Django development server
-
-Monitor Celery tasks using flower or logs
+    1.Activate virtual environment
+    2.Install new dependencies: pip install <package>
+    3.Update requirements: pip freeze > requirements.txt
+    4.Run migrations after model changes
+    5.Test endpoints using Django development server
+    6.Monitor Celery tasks using flower or logs
 
 Monitoring
 Celery Flower (Monitoring Tool)
