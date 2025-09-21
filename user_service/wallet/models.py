@@ -1,38 +1,13 @@
 from django.db import models
-from django.conf import settings
-from wallet.services.wallet_transaction import wallet_transaction
 from django.core.validators import MinValueValidator
-class WalletSummary(models.Model):
-    """Summary table for faster balance queries"""
-    user = models.OneToOneField(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-        related_name='wallet_summary'
-    )
-    
-    current_balance = models.DecimalField(
-        max_digits=15,
-        decimal_places=2,
-        default=0
-    )
-    
-    last_transaction = models.ForeignKey(
-        wallet_transaction,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True
-    )
-    
-    updated_at = models.DateTimeField(auto_now=True)
-    
-    class Meta:
-        verbose_name_plural = "Wallet Summaries"
-    
-    def __str__(self):
-        return f"{self.user.username} - Balance: {self.current_balance}"
- 
- # Wallet Transaction Model   
-class wallet_transaction(models.Model):
+from django.conf import settings
+from decimal import Decimal
+import uuid  # Import uuid yang hilang
+
+# Wallet Transaction Model harus didefinisikan SEBELUM WalletSummary
+# karena WalletSummary memiliki ForeignKey ke wallet_transaction
+
+class WalletTransaction(models.Model):  
     class TransactionType(models.TextChoices):
         DEBIT = 'DEBIT', 'Debit'
         CREDIT = 'CREDIT', 'Credit'
@@ -78,7 +53,7 @@ class wallet_transaction(models.Model):
         related_name='referred_transactions'
     )
     
-    transaction_id = models.CharField(max_length=50, unique=True)  # External transaction ID
+    transfer_transaction= models.CharField(max_length=150,default="",null=True,blank=True)
     description = models.TextField(blank=True, null=True)
     
     # Metadata
@@ -88,16 +63,48 @@ class wallet_transaction(models.Model):
     class Meta:
         indexes = [
             models.Index(fields=['user', 'created_at']),
-            models.Index(fields=['transaction_id']),
+            models.Index(fields=['transfer_transaction']),
             models.Index(fields=['created_at']),
         ]
         ordering = ['-created_at']
+        verbose_name = "Wallet Transaction"
+        verbose_name_plural = "Wallet Transactions"
     
     def save(self, *args, **kwargs):
-        if not self.transaction_id:
+        if not self.transfer_transaction:
             # Generate unique transaction ID
-            self.transaction_id = f"TX{uuid.uuid4().hex[:16].upper()}"
+            self.transfer_transaction = f"TX{uuid.uuid4().hex[:16].upper()}"
         super().save(*args, **kwargs)
     
     def __str__(self):
         return f"{self.user.username} - {self.type_transaction} - {self.amount}"
+
+
+class WalletSummary(models.Model):
+    """Summary table for faster balance queries"""
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='wallet_summary'
+    )
+    
+    current_balance = models.DecimalField(
+        max_digits=15,
+        decimal_places=2,
+        default=0
+    )
+    
+    last_transaction = models.ForeignKey(
+        WalletTransaction,  # Menggunakan nama class yang benar
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
+    )
+    
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        verbose_name_plural = "Wallet Summaries"
+    
+    def __str__(self):
+        return f"{self.user.username} - Balance: {self.current_balance}"

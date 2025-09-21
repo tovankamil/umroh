@@ -41,7 +41,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'users',
-    'sponsorships'
+    'sponsorships',
+    'wallet'
 ]
 
 MIDDLEWARE = [

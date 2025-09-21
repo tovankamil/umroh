@@ -2,7 +2,7 @@
 from django.db import transaction
 from django.core.exceptions import ValidationError
 from decimal import Decimal
-from .models import WalletTransaction, WalletSummary
+from wallet.models import WalletTransaction, WalletSummary
 from django.conf import settings
 
 class WalletService:
@@ -15,7 +15,7 @@ class WalletService:
         type_bonus=None,
         reference_user=None,
         description=None,
-        transaction_id=None
+        transfer_transaction=None
     ):
         """
         Atomic transaction creation with balance validation
@@ -38,7 +38,7 @@ class WalletService:
             type_bonus=type_bonus,
             reference_user=reference_user,
             description=description,
-            transaction_id=transaction_id
+            transfer_transaction=transfer_transaction
         )
         
         # Full clean and save
