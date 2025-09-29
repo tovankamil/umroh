@@ -1,9 +1,14 @@
 import axios from "axios";
 
-const API_URL = "https://your-api-endpoint.com";
+// Menggunakan import.meta.env di Vite
+const API_URL = import.meta.env.VITE_BACKEND_API_URL;
+
+if (!API_URL) {
+  throw new Error("BACKEND_API_URL environment variable is not defined");
+}
 
 export interface LoginCredentials {
-  email: string;
+  username: string;
   password: string;
 }
 
@@ -11,7 +16,7 @@ export interface AuthResponse {
   token: string;
   user: {
     id: string;
-    email: string;
+    username: string;
     name: string;
   };
 }
