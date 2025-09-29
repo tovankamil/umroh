@@ -22,7 +22,7 @@ class BonusSponsorServiceTestCase(TestCase):
         self.handler.setLevel(logging.INFO)
         self.handler.emit = lambda record: self.log_capture.append(record.getMessage())
         
-        # Get logger and add handler - PERBAIKAN: sponsorships bukan sponsoships
+        # Get logger and add handler 
         # Good catch on the typo fix! This shows attention to detail
         self.logger = logging.getLogger('sponsorships.services.BonusSponsorService')
         self.logger.addHandler(self.handler)
