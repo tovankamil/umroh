@@ -1,7 +1,10 @@
-import React, { useState } from "react";
-import { useAppDispatch } from "../app/hooks"; // Menggunakan custom hook
+import React, { useState, useEffect } from "react";
+import { useAppDispatch } from "../app/hooks";
 import { loginUser } from "../features/auth/authSlice";
+import { useNavigate } from "react-router-dom";
 import type { LoginCredentials } from "../features/auth/authService";
+import { useSelector } from "react-redux";
+import type { RootState } from "../app/store";
 
 const Login: React.FC = () => {
   const [credentials, setCredentials] = useState<LoginCredentials>({
@@ -9,8 +12,20 @@ const Login: React.FC = () => {
     password: "",
   });
 
-  // Menggunakan useAppDispatch instead of useDispatch
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+
+  // Ambil status autentikasi dari Redux store
+  const { isAuthenticated, isLoading, error } = useSelector(
+    (state: RootState) => state.auth
+  );
+
+  // Efek untuk mengarahkan ke dashboard jika sudah terautentikasi
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/dashboard");
+    }
+  }, [isAuthenticated, navigate]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -30,6 +45,12 @@ const Login: React.FC = () => {
             Sign in to your account
           </h2>
         </div>
+
+        {/* Tampilkan pesan error jika ada */}
+        {error && (
+          <div className="bg-red-50 text-red-700 p-3 rounded-md">{error}</div>
+        )}
+
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="rounded-md shadow-sm -space-y-px">
             <div>
@@ -59,9 +80,10 @@ const Login: React.FC = () => {
           <div>
             <button
               type="submit"
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              disabled={isLoading}
+              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
             >
-              Sign in
+              {isLoading ? "Signing in..." : "Sign in"}
             </button>
           </div>
         </form>

@@ -51,6 +51,7 @@ python manage.py runserver
 
 Start Celery Worker
 celery -A userservice worker --loglevel=info
+python -m celery -A userservice worker --loglevel=info --logfile=celery.log --pool=solo
 
 For Debugging Celery
 celery -A userservice worker --loglevel=debug --logfile=celery.log --concurrency=2

@@ -1,5 +1,4 @@
 import { useSelector, useDispatch } from "react-redux";
-
 import { logout } from "../features/auth/authSlice";
 import type { RootState } from "@/app/store";
 
@@ -20,5 +19,9 @@ export const useAuth = () => {
     error,
     handleLogout,
     isAuthenticated: !!token,
+    // Anda bisa menambahkan akses ke field spesifik jika perlu
+    username: user?.username,
+    email: user?.email,
+    levelStatus: user?.level_status,
   };
 };
