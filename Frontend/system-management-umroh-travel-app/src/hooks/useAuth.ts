@@ -1,27 +1,44 @@
-import { useSelector, useDispatch } from "react-redux";
-import { logout } from "../features/auth/authSlice";
-import type { RootState } from "@/app/store";
+// src/hooks/useAuth.ts
+import { useAppDispatch, useAppSelector } from "../app/hooks";
+import { fetchUserData, logout } from "../features/auth/authSlice";
 
 export const useAuth = () => {
-  const { user, token, isLoading, error } = useSelector(
-    (state: RootState) => state.auth
-  );
-  const dispatch = useDispatch();
+  const {
+    user,
+    username,
+    token,
+    isLoading,
+    error,
+    userData,
+    isUserDataLoading,
+  } = useAppSelector((state) => state.auth);
+  const dispatch = useAppDispatch();
 
   const handleLogout = () => {
     dispatch(logout());
   };
 
+  const handleFetchUserData = () => {
+    console.log(username);
+    // Pastikan username ada sebelum mengambil data
+    if (username) {
+      dispatch(fetchUserData(username));
+    }
+  };
+
+  // Hitung isAuthenticated dari token
+  const isAuthenticated = !!token;
+
   return {
     user,
+    username,
     token,
     isLoading,
     error,
+    userData,
+    isUserDataLoading,
     handleLogout,
-    isAuthenticated: !!token,
-    // Anda bisa menambahkan akses ke field spesifik jika perlu
-    username: user?.username,
-    email: user?.email,
-    levelStatus: user?.level_status,
+    handleFetchUserData,
+    isAuthenticated,
   };
 };

@@ -1,10 +1,9 @@
+// src/components/Login.tsx
 import React, { useState, useEffect } from "react";
-import { useAppDispatch } from "../app/hooks";
+import { useAppDispatch, useAppSelector } from "../app/hooks";
 import { loginUser } from "../features/auth/authSlice";
 import { useNavigate } from "react-router-dom";
 import type { LoginCredentials } from "../features/auth/authService";
-import { useSelector } from "react-redux";
-import type { RootState } from "../app/store";
 
 const Login: React.FC = () => {
   const [credentials, setCredentials] = useState<LoginCredentials>({
@@ -15,12 +14,10 @@ const Login: React.FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
-  // Ambil status autentikasi dari Redux store
-  const { isAuthenticated, isLoading, error } = useSelector(
-    (state: RootState) => state.auth
-  );
+  // Ambil token dari state untuk menentukan isAuthenticated
+  const { token, isLoading, error } = useAppSelector((state) => state.auth);
+  const isAuthenticated = !!token;
 
-  // Efek untuk mengarahkan ke dashboard jika sudah terautentikasi
   useEffect(() => {
     if (isAuthenticated) {
       navigate("/dashboard");
@@ -46,7 +43,6 @@ const Login: React.FC = () => {
           </h2>
         </div>
 
-        {/* Tampilkan pesan error jika ada */}
         {error && (
           <div className="bg-red-50 text-red-700 p-3 rounded-md">{error}</div>
         )}

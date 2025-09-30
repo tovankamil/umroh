@@ -6,4 +6,4 @@ class SponsorshipSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Sponsorship
-        fields = ['id', 'sponsor', 'member_sponsorhip',  'user_level', 'created_at', 'updated_at']
+        fields = ['id', 'sponsor', 'member_sponsorhip',  'created_at', 'updated_at']

@@ -47,10 +47,10 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+     'corsheaders.middleware.CorsMiddleware',
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
-     'corsheaders.middleware.CorsMiddleware',
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
@@ -78,10 +78,34 @@ TEMPLATES = [
 WSGI_APPLICATION = "userservice.wsgi.application"
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
-    # Jika kamu juga mengakses frontend menggunakan 127.0.0.1, tambahkan ini juga
-    "http://127.0.0.1:5173", 
+    "http://127.0.0.1:5173",
 ]
 
+# Izinkan credentials (cookies, authorization headers)
+CORS_ALLOW_CREDENTIALS = True
+
+# Izinkan metode HTTP yang diperlukan
+CORS_ALLOWED_METHODS = [
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
+]
+
+# Izinkan header yang diperlukan
+CORS_ALLOWED_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 

@@ -1,17 +1,12 @@
-import axios from "axios";
+// src/services/authService.ts
 
-const API_URL = import.meta.env.VITE_BACKEND_API_URL;
-
-if (!API_URL) {
-  throw new Error("BACKEND_API_URL environment variable is not defined");
-}
+import api from "@/services/api";
 
 export interface LoginCredentials {
   username: string;
   password: string;
 }
 
-// Sesuaikan interface dengan respons backend
 export interface AuthResponse {
   status: string;
   messages: string[];
@@ -26,9 +21,45 @@ export interface AuthResponse {
   };
 }
 
+// Interface untuk data user lengkap
+export interface UserData {
+  user: {
+    username: string;
+    name: string | null;
+    // phone_number: string;
+    ktp: string;
+    address: string;
+    province: string;
+    city: string;
+    district: string;
+    postal_code: string;
+    level_status: string;
+    sponsorships: any[];
+    sponsorships_given: any[];
+  };
+  sponsorships_received_count: number;
+  sponsorships_given_count: number;
+  sponsorships_received: any[];
+  sponsorships_given: any[];
+}
+
 export const login = async (
   credentials: LoginCredentials
 ): Promise<AuthResponse> => {
-  const response = await axios.post(`${API_URL}api/v1/login/`, credentials);
+  // Untuk login, kita tidak menggunakan interceptor karena belum ada token
+  const response = await api.post("/api/v1/login/", credentials);
   return response.data;
+};
+
+// Fungsi untuk mengambil data user
+export const getUserData = async (username: string): Promise<UserData> => {
+  try {
+    console.log(`Fetching user data for: ${username}`);
+    const response = await api.get(`/api/v1/users/${username}`);
+    console.log("User data response:", response.data);
+    return response.data.data;
+  } catch (error) {
+    console.error("Error fetching user data:", error);
+    throw error;
+  }
 };
