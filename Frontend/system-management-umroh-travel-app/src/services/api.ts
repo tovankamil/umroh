@@ -50,6 +50,8 @@ api.interceptors.response.use(
 
     // Jika response error (misalnya token expired)
     if (error.response && error.response.status === 401) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("username"); // Tambahkan ini
       console.log("Unauthorized, redirecting to login");
       // Redirect ke halaman login
       window.location.href = "/login";

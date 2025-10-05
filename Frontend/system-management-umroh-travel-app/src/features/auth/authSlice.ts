@@ -2,6 +2,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import {
   getUserData,
+  verifyToken,
   login,
   type LoginCredentials,
   type UserData,
@@ -84,6 +85,24 @@ export const fetchUserData = createAsyncThunk(
   }
 );
 
+// Token Verification Async Thunkq
+export const verifyTokenAuth = createAsyncThunk(
+  "auth/tokenverify",
+  async (token: string, { rejectWithValue }) => {
+    try {
+      if (!token) {
+        throw new Error("No token found");
+      }
+      const userData = await verifyToken(token);
+      return userData;
+    } catch (error: any) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to fetch user data"
+      );
+    }
+  }
+);
+
 const authSlice = createSlice({
   name: "auth",
   initialState,
@@ -112,6 +131,18 @@ const authSlice = createSlice({
       .addCase(loginUser.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload as string;
+      })
+      .addCase(verifyTokenAuth.pending, (state) => {
+        state.isUserDataLoading = true;
+        state.error = null;
+      })
+      .addCase(verifyTokenAuth.fulfilled, (state) => {
+        state.isLoading = false;
+        state.error = null;
+      })
+      .addCase(verifyTokenAuth.rejected, (state) => {
+        state.isUserDataLoading = false;
+        state.error = null;
       })
       .addCase(fetchUserData.pending, (state) => {
         state.isUserDataLoading = true;

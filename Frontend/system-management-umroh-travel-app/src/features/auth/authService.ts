@@ -54,12 +54,20 @@ export const login = async (
 // Fungsi untuk mengambil data user
 export const getUserData = async (username: string): Promise<UserData> => {
   try {
-    console.log(`Fetching user data for: ${username}`);
     const response = await api.get(`/api/v1/users/${username}`);
     console.log("User data response:", response.data);
     return response.data.data;
   } catch (error) {
-    console.error("Error fetching user data:", error);
     throw error;
+  }
+};
+
+export const verifyToken = async (token: string): Promise<boolean> => {
+  try {
+    const response = await api.post("/api/v1/token/verify/", { token });
+    console.log(response);
+    return response.data.valid;
+  } catch (error) {
+    return false;
   }
 };
