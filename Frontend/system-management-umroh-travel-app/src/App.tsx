@@ -1,11 +1,13 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Provider } from "react-redux";
+import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import { store } from "./app/store";
 
-import Dashboard from "./pages/Dashboard";
-import Home from "./pages/Home";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Login from "./components/login";
+import Dashboard from "./pages/Dashboard";
+import Home from "./pages/Home";
+import UserProfile from "./pages/UserProfile";
+import WalletHistory from "./pages/WalletHistory";
 
 function App() {
   return (
@@ -19,6 +21,22 @@ function App() {
             element={
               <ProtectedRoute>
                 <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <UserProfile />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/wallet"
+            element={
+              <ProtectedRoute>
+                <WalletHistory />
               </ProtectedRoute>
             }
           />

@@ -111,11 +111,68 @@
   --sidebar-ring: oklch(0.552 0.016 285.938);
 }
 
+/* Pastikan Anda mengedit file CSS Global (misalnya src/app/globals.css) */
+
 @layer base {
-  * {
-    @apply border-border outline-ring/50;
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 47.4% 11.2%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 47.4% 11.2%;
+
+    /* ---------------------------------------------------- */
+    /* PENYESUAIAN TEMA UTAMA (HIJAU TUA) */
+    /* Warna Hijau Tosca/Tua (sekitar #008060) */
+    --primary: 160 100% 25%; /* HSL untuk Hijau Tua */
+    --primary-foreground: 0 0% 100%; /* Teks Putih */
+    /* ---------------------------------------------------- */
+
+    /* ---------------------------------------------------- */
+    /* PENYESUAIAN WARNA SEKUNDER (EMAS/KUNING GELAP) */
+    /* Warna Emas/Kuning Gelap (sekitar #FFC107) */
+    --secondary: 40 100% 50%; /* HSL untuk Emas/Kuning */
+    --secondary-foreground: 222.2 47.4% 11.2%; /* Teks Gelap */
+    /* ---------------------------------------------------- */
+
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 160 100% 25%; /* Gunakan Primary untuk ring/focus */
+    --radius: 0.5rem;
   }
-  body {
-    @apply bg-background text-foreground;
+
+  /* Jika Anda menggunakan Dark Mode, ubah juga blok .dark */
+  .dark {
+    --background: 224 71% 4%;
+    --foreground: 210 20% 98%;
+
+    /* ---------------------------------------------------- */
+    /* PENYESUAIAN TEMA UTAMA UNTUK DARK MODE */
+    --primary: 160 100% 35%; /* Hijau Tua sedikit lebih terang untuk kontras */
+    --primary-foreground: 210 20% 98%;
+    /* ---------------------------------------------------- */
+
+    /* ---------------------------------------------------- */
+    /* PENYESUAIAN WARNA SEKUNDER UNTUK DARK MODE */
+    --secondary: 40 100% 50%; /* Tetap Emas/Kuning */
+    --secondary-foreground: 210 20% 98%; /* Teks Terang */
+    /* ---------------------------------------------------- */
+
+    --card: 224 71% 4%;
+    --card-foreground: 210 20% 98%;
+    --muted: 220 70% 8%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 220 70% 8%;
+    --accent-foreground: 210 20% 98%;
+    --destructive: 0 63% 31%;
+    --destructive-foreground: 210 20% 98%;
+    --border: 216 10% 25%;
+    --input: 216 10% 25%;
+    --ring: 160 100% 35%; /* Gunakan Primary Dark Mode untuk ring/focus */
   }
 }

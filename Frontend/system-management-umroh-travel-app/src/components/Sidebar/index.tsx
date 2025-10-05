@@ -1,11 +1,12 @@
-// src/components/Sidebar.tsx
 import React from "react";
 import { Home, User, Wallet, FileText, Clock } from "lucide-react";
-import { Link } from "react-router-dom"; // Asumsi menggunakan React Router
-import { cn } from "@/lib/utils"; // Fungsi cn dari shadcn/ui
+import { Link } from "react-router-dom";
+import { cn } from "@/lib/utils";
+// Ganti dengan state atau hook yang sesuai dari router Anda untuk menentukan path aktif
+const activePath = "/";
 
 const navItems = [
-  { name: "Home", icon: Home, path: "/" },
+  { name: "Home", icon: Home, path: "/dashboard" },
   { name: "Profile", icon: User, path: "/profile" },
   { name: "Wallet", icon: Wallet, path: "/wallet" },
   { name: "Report", icon: FileText, path: "/report" },
@@ -16,32 +17,50 @@ interface SidebarProps {
   className?: string;
 }
 
-// Komponen sekarang menerima className
 export function Sidebar({ className }: SidebarProps) {
   return (
-    // Gunakan fungsi cn untuk menggabungkan default class dengan class dari prop
     <div
       className={cn(
         "flex flex-col border-r h-full bg-background p-4",
         className
       )}
     >
-      {/* Judul/Logo */}
-      <h1 className="text-xl font-bold mb-6 mt-4 px-2">Dashboard App</h1>
+      {/* --- LOGO GAMBAR --- */}
+      {/* Logo dari path public/images/logo/logo-andiarta-wisata.png */}
+      <div className="mb-8  px-2">
+        <img
+          // Pastikan path ini benar sesuai struktur folder Anda di 'public'
+          src="/images/logo/logo-andiarta-wisata.png"
+          alt="ANDIARTA Tour & Travel Logo"
+          // Mengatur lebar agar maksimum 48 unit dan responsif
+          className="h-auto w-full max-w-[8rem]"
+          style={{ filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.1))" }}
+        />
+      </div>
+      {/* -------------------- */}
 
       {/* Menu Navigasi */}
       <nav className="flex flex-col space-y-2">
-        {navItems.map((item) => (
-          <Link
-            key={item.name}
-            to={item.path}
-            // Tambahkan class agar tombol menempati lebar penuh
-            className="flex items-center space-x-3 p-3 rounded-md hover:bg-muted transition-colors text-sm font-medium"
-          >
-            <item.icon className="h-5 w-5" />
-            <span>{item.name}</span>
-          </Link>
-        ))}
+        {navItems.map((item) => {
+          const isActive = item.path === activePath;
+
+          return (
+            <Link
+              key={item.name}
+              to={item.path}
+              // Menerapkan warna tema Hijau-Emas
+              className={cn(
+                "flex items-center space-x-3 p-3 rounded-lg transition-all text-sm font-medium",
+                isActive
+                  ? "bg-primary text-primary-foreground shadow-md"
+                  : "text-foreground hover:bg-primary/10 hover:text-primary"
+              )}
+            >
+              <item.icon className="h-5 w-5" />
+              <span>{item.name}</span>
+            </Link>
+          );
+        })}
       </nav>
     </div>
   );
