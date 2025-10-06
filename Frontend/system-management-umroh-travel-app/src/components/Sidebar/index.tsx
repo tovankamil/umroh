@@ -1,16 +1,14 @@
-import React from "react";
-import { Home, User, Wallet, FileText, Clock } from "lucide-react";
-import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import { Home, User, UserPlus, Wallet } from "lucide-react";
+import { Link } from "react-router-dom";
 // Ganti dengan state atau hook yang sesuai dari router Anda untuk menentukan path aktif
 const activePath = "/";
 
 const navItems = [
   { name: "Home", icon: Home, path: "/dashboard" },
+  { name: "Registrasi", icon: UserPlus, path: "/registrasi" },
   { name: "Profile", icon: User, path: "/profile" },
   { name: "Wallet", icon: Wallet, path: "/wallet" },
-  { name: "Report", icon: FileText, path: "/report" },
-  { name: "History", icon: Clock, path: "/history" },
 ];
 
 interface SidebarProps {

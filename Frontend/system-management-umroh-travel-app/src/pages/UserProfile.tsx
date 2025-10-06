@@ -24,6 +24,21 @@ interface UserProfileData {
   level: string;
 }
 
+interface ActivityLog {
+  id: number;
+  date: string;
+  action: string;
+  details: string;
+}
+
+interface LoginLog {
+  id: number;
+  date: string;
+  device: string;
+  location: string;
+  status: "SUCCESS" | "FAILED";
+}
+
 const DUMMY_USER_DATA: UserProfileData = {
   name: "Budi Santoso",
   email: "budi.santoso@mitra.com",
@@ -33,6 +48,57 @@ const DUMMY_USER_DATA: UserProfileData = {
   lastLogin: "Baru saja",
   level: "Gold Partner",
 };
+
+const DUMMY_ACTIVITY_LOG: ActivityLog[] = [
+  {
+    id: 1,
+    date: "20 Sep 2024, 14:30",
+    action: "Pembaruan Nomor Telepon",
+    details: "Diubah dari 0812...789 ke 0813...000",
+  },
+  {
+    id: 2,
+    date: "15 Sep 2024, 09:15",
+    action: "Ubah Kata Sandi",
+    details: "Dilakukan melalui email reset",
+  },
+  {
+    id: 3,
+    date: "01 Sep 2024, 11:00",
+    action: "Pembaruan Alamat",
+    details: "Diubah menjadi Jl. Asia Afrika No. 5",
+  },
+  {
+    id: 4,
+    date: "25 Agu 2024, 17:00",
+    action: "Pembaruan Nama",
+    details: "Diubah dari 'Budi S.' ke 'Budi Santoso'",
+  },
+];
+
+const DUMMY_LOGIN_LOG: LoginLog[] = [
+  {
+    id: 1,
+    date: "05 Okt 2025, 17:30",
+    device: "Chrome (Windows 10)",
+    location: "Jakarta, Indonesia",
+    status: "SUCCESS",
+  },
+  {
+    id: 2,
+    date: "04 Okt 2025, 10:15",
+    device: "Safari (iPhone 13)",
+    location: "Bandung, Indonesia",
+    status: "SUCCESS",
+  },
+  {
+    id: 3,
+    date: "03 Okt 2025, 23:45",
+    device: "Firefox (Linux)",
+    location: "Singapore (Gagal)",
+    status: "FAILED",
+  },
+];
 
 /**
  * Komponen untuk menampilkan dan mengedit informasi Profil Pengguna.
@@ -106,6 +172,7 @@ const UserProfile: React.FC = () => {
           Kelola informasi pribadi dan detail kemitraan Anda.
         </p>
 
+        {/* --- KARTU UTAMA PROFIL --- */}
         <Card className="shadow-2xl max-w-4xl mx-auto">
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="text-2xl">Informasi Akun</CardTitle>
@@ -230,6 +297,86 @@ const UserProfile: React.FC = () => {
             )}
           </CardContent>
         </Card>
+
+        {/* --- BAGIAN RIWAYAT AKUN & KEAMANAN BARU --- */}
+        <h2 className="text-2xl font-bold text-gray-800 pt-8">
+          Riwayat Akun & Keamanan
+        </h2>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Card Riwayat Aktivitas Profil */}
+          <Card className="shadow-xl">
+            <CardHeader>
+              <CardTitle className="text-xl">
+                Riwayat Aktivitas Profil
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {/* List Aktivitas */}
+              {DUMMY_ACTIVITY_LOG.map((log) => (
+                <div
+                  key={log.id}
+                  className="flex flex-col space-y-1 py-3 border-b border-gray-100 last:border-b-0"
+                >
+                  <div className="flex justify-between items-start">
+                    <span className="font-semibold text-gray-800">
+                      {log.action}
+                    </span>
+                    <span className="text-xs text-gray-500 flex-shrink-0 ml-2">
+                      {log.date}
+                    </span>
+                  </div>
+                  <p className="text-sm text-gray-600">{log.details}</p>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+
+          {/* Card Riwayat Login Terakhir */}
+          <Card className="shadow-xl">
+            <CardHeader>
+              <CardTitle className="text-xl">Riwayat Login Terakhir</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {/* List Login */}
+              {DUMMY_LOGIN_LOG.map((log) => (
+                <div
+                  key={log.id}
+                  className="flex items-center space-x-3 py-3 border-b border-gray-100 last:border-b-0"
+                >
+                  {/* Icon tergantung status */}
+                  <MapPin
+                    className={`h-5 w-5 ${
+                      log.status === "SUCCESS"
+                        ? "text-green-500"
+                        : "text-red-500"
+                    }`}
+                  />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold truncate text-gray-800">
+                      {log.device}
+                    </p>
+                    <p className="text-xs text-gray-500">{log.location}</p>
+                  </div>
+                  <div className="flex flex-col items-end">
+                    <span
+                      className={`text-xs font-bold px-2 py-0.5 rounded-full ${
+                        log.status === "SUCCESS"
+                          ? "bg-green-100 text-green-700"
+                          : "bg-red-100 text-red-700"
+                      } flex-shrink-0`}
+                    >
+                      {log.status === "SUCCESS" ? "Sukses" : "Gagal"}
+                    </span>
+                    <span className="text-xs text-gray-500 mt-1">
+                      {log.date.split(",")[1].trim()}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        </div>
+        {/* --- AKHIR BAGIAN RIWAYAT AKUN & KEAMANAN BARU --- */}
       </div>
     </DashboardLayout>
   );

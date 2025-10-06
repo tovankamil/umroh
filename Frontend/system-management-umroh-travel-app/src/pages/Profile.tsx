@@ -1,9 +1,8 @@
 // src/pages/Dashboard.tsx
-import Nav from "@/components/Nav";
+import { DashboardLayout } from "@/components/DashboardLayout";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
-import { DashboardLayout } from "@/components/DashboardLayout";
 
 const Profile: React.FC = () => {
   const {

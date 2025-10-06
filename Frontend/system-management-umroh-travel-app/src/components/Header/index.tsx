@@ -1,9 +1,8 @@
 // src/components/Header.tsx
 
-import React, { type FC } from "react";
-import { Menu, LogOut, Loader2 } from "lucide-react"; // Menambahkan LogOut & Loader2
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Loader2, LogOut, Menu } from "lucide-react"; // Menambahkan LogOut & Loader2
 import { Sidebar } from "../Sidebar";
 
 // Definisi Interface Props
@@ -74,11 +73,14 @@ export function Header({
             className="h-10 px-4 py-2 text-sm font-medium text-gray-900 " // Beri sedikit padding agar tidak terlalu kecil
           >
             {isLoggingOut ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              <Loader2
+                className="mdL:mr-2 h-4 w-4 animate-spin text-white fill-amber-50"
+                color="#ffffff"
+              />
             ) : (
               <LogOut className="mr-2 h-4 w-4" />
             )}
-            Logout
+            <span className="hidden md:block text-gray-200">Logout</span>
           </Button>
         </div>
       </div>

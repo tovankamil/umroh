@@ -8,6 +8,7 @@ import Dashboard from "./pages/Dashboard";
 import Home from "./pages/Home";
 import UserProfile from "./pages/UserProfile";
 import WalletHistory from "./pages/WalletHistory";
+import RegistrationForm from "./pages/RegistrationForm";
 
 function App() {
   return (
@@ -29,6 +30,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <UserProfile />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/registrasi"
+            element={
+              <ProtectedRoute>
+                <RegistrationForm />
               </ProtectedRoute>
             }
           />
