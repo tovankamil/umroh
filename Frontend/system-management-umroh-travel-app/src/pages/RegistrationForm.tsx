@@ -1,5 +1,5 @@
 // @ts-nocheck
-import React, { useState, memo } from "react";
+import React, { useState, useEffect } from "react";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -11,44 +11,122 @@ import {
   Key,
   Phone,
   MapPin,
+  Mail,
 } from "lucide-react";
 import FormInput from "@/components/FormInput";
+import { useRegister } from "@/hooks/useRegister";
+import ErrorModal from "@/components/ErrorModal";
 import { validate } from "@/constants/validation";
+import SuccessModal from "@/components/SuccessModal";
 
-// Initial data structure for the form, including the new 'password' field.
+// Initial data structure for the form
 const initialFormData = {
   username: "",
-  password: "", // New field for password
-  sponsor: "",
+  password: "",
+  sponsor_username: "",
   name: "",
+  email: "",
   ktp: "",
-  phoneNumber: "",
+  phone_number: "",
   address: "",
   province: "",
   city: "",
   district: "",
-  postalCode: "",
-  heir: "", // ahliwaris (heir)
+  postal_code: "",
+  ahliwaris: "",
 };
 
-// Helper component for input fields, defined outside and memoized for performance
-// Props are passed explicitly from the parent component.
-
-/**
- * Component for New Partner Registration Form.
- */
 const RegistrationForm: React.FC = () => {
   const [formData, setFormData] = useState(initialFormData);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState({});
+  const [showErrorModal, setShowErrorModal] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [modalErrorMessage, setModalErrorMessage] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<string[]>([]);
+  const [lastSubmittedData, setLastSubmittedData] = useState(null);
+
+  const { handleRegisterWithFormData, loading, error, success, detailError } =
+    useRegister();
+
+  // Handle API error and success states
+  useEffect(() => {
+    console.log("detailError", detailError);
+    if (error) {
+      let cleanErrorMessage = "Terjadi kesalahan saat registrasi.";
+      let extractedFieldErrors: string[] = [];
+
+      if (typeof error === "string") {
+        // If error is already a string
+        cleanErrorMessage = error;
+      } else if (error.response?.data) {
+        const errorData = error.response.data;
+
+        // Handle the specific format: {"message":"Validasi gagal.","errors":["username: Username sudah digunakan."]}
+        if (errorData.message) {
+          cleanErrorMessage = errorData.message;
+        }
+
+        if (errorData.errors && Array.isArray(errorData.errors)) {
+          // Extract field errors from array format
+          extractedFieldErrors = errorData.errors.map((errorItem) => {
+            if (typeof errorItem === "string") {
+              return errorItem;
+            }
+            return String(errorItem);
+          });
+
+          // Also update form field errors for inline display
+          const newFieldErrors = {};
+          errorData.errors.forEach((errorItem) => {
+            if (typeof errorItem === "string") {
+              // Extract field name from error message (format: "field_name: Error message")
+              const fieldMatch = errorItem.match(/^(\w+):\s*(.+)/);
+              if (fieldMatch) {
+                const fieldName = fieldMatch[1];
+                const errorMessage = fieldMatch[2];
+                newFieldErrors[fieldName] = errorMessage;
+              }
+            }
+          });
+          setErrors((prev) => ({ ...prev, ...newFieldErrors }));
+        }
+
+        // Fallback for other error formats
+        else if (errorData.detail) {
+          cleanErrorMessage = errorData.detail;
+        } else if (typeof errorData === "string") {
+          cleanErrorMessage = errorData;
+        }
+      } else if (error.message) {
+        cleanErrorMessage = error.message;
+      }
+
+      console.log("Processed error message:", cleanErrorMessage);
+      console.log("Processed field errors:", extractedFieldErrors);
+
+      setModalErrorMessage(cleanErrorMessage);
+      setFieldErrors(detailError || extractedFieldErrors);
+      setShowErrorModal(true);
+    }
+  }, [error]);
+
+  useEffect(() => {
+    if (success) {
+      setShowSuccessModal(true);
+      setFormData(initialFormData); // Reset form on success
+      setLastSubmittedData(null);
+      setErrors({});
+      setFieldErrors([]);
+    }
+  }, [success]);
 
   // Handle input changes
   const handleChange = (e) => {
     const { name, value } = e.target;
     let newValue = value;
 
-    // Filter non-digit characters for number-only fields (KTP, Phone, Postal Code)
-    if (["ktp", "phoneNumber", "postalCode"].includes(name)) {
+    // Filter non-digit characters for number-only fields
+    if (["ktp", "phone_number", "postal_code"].includes(name)) {
       newValue = value.replace(/\D/g, "");
     }
 
@@ -60,33 +138,75 @@ const RegistrationForm: React.FC = () => {
     }
   };
 
-  // Comprehensive validation function implementing all rules
-
   // Handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!validate()) {
-      console.error("Validation failed.");
+
+    // Clear previous errors
+    setErrors({});
+    setFieldErrors([]);
+
+    // Validate form
+    const formErrors = validate(formData);
+    console.log("Form validation errors:", formErrors);
+
+    if (Object.keys(formErrors).length > 0) {
+      setErrors(formErrors);
+
+      // Convert form errors to fieldErrors format for modal
+      const errorList = Object.entries(formErrors).map(([field, message]) => {
+        // Convert field name to more readable format
+        const fieldName = field.replace(/_/g, " ");
+        return `${fieldName}: ${message}`;
+      });
+
+      setModalErrorMessage("Validasi form gagal");
+      setFieldErrors(errorList);
+      setShowErrorModal(true);
       return;
     }
 
-    setIsSubmitting(true);
+    setLastSubmittedData({ ...formData }); // Save data for retry
+    handleRegisterWithFormData(formData);
+  };
 
-    // Simulate API registration call
-    setTimeout(() => {
-      console.log("Data registered:", formData);
-      setFormData(initialFormData); // Reset form upon success
-      setIsSubmitting(false);
-      // Replaced alert() with console.log and a success message in the console
-      console.log("Registrasi Mitra Baru Berhasil! (Data dicetak ke konsol)");
-    }, 2000);
+  // Retry submission with same data
+  const handleRetry = () => {
+    setShowErrorModal(false);
+    if (lastSubmittedData) {
+      // Auto-focus on username field if it's a username error
+      if (
+        modalErrorMessage.includes("username") ||
+        fieldErrors.some((error) => error.toLowerCase().includes("username"))
+      ) {
+        const usernameInput = document.querySelector('input[name="username"]');
+        if (usernameInput) {
+          usernameInput.focus();
+          usernameInput.select();
+        }
+      }
+
+      // You can also resubmit automatically if needed
+      // handleRegisterWithFormData(lastSubmittedData);
+    }
+  };
+
+  // Close modals
+  const closeErrorModal = () => {
+    setShowErrorModal(false);
+    setModalErrorMessage("");
+    setFieldErrors([]);
+  };
+
+  const closeSuccessModal = () => {
+    setShowSuccessModal(false);
   };
 
   // Define props that are consistently passed to FormInput
   const inputProps = {
     formData,
     handleChange,
-    isSubmitting,
+    isSubmitting: loading,
   };
 
   return (
@@ -102,6 +222,7 @@ const RegistrationForm: React.FC = () => {
         </p>
 
         <form onSubmit={handleSubmit} className="max-w-5xl mx-auto space-y-8">
+          {/* Data Akun & Sponsor Card */}
           <Card className="shadow-2xl">
             <CardHeader>
               <CardTitle className="text-xl flex items-center text-primary">
@@ -116,7 +237,7 @@ const RegistrationForm: React.FC = () => {
                 error={errors.username}
                 {...inputProps}
               />
-              <FormInput // Added Password Field
+              <FormInput
                 label="Password"
                 name="password"
                 type="password"
@@ -125,18 +246,24 @@ const RegistrationForm: React.FC = () => {
                 {...inputProps}
               />
               <FormInput
-                label="ID Sponsor"
-                name="sponsor"
-                icon={<UserPlus className="h-4 w-4" />}
-                error={errors.sponsor}
+                label="Email"
+                name="email"
+                type="email"
+                icon={<Mail className="h-4 w-4" />}
+                error={errors.email}
                 {...inputProps}
               />
-              <div className="md:col-span-2">
-                {/* Empty space for alignment */}
-              </div>
+              <FormInput
+                label="ID Sponsor"
+                name="sponsor_username"
+                icon={<UserPlus className="h-4 w-4" />}
+                error={errors.sponsor_username}
+                {...inputProps}
+              />
             </CardContent>
           </Card>
 
+          {/* Informasi Pribadi Card */}
           <Card className="shadow-2xl">
             <CardHeader>
               <CardTitle className="text-xl flex items-center text-primary">
@@ -155,28 +282,30 @@ const RegistrationForm: React.FC = () => {
                 label="Nomor KTP"
                 name="ktp"
                 type="text"
+                maxLength={16}
                 icon={<Key className="h-4 w-4" />}
                 error={errors.ktp}
                 {...inputProps}
               />
               <FormInput
                 label="Nomor Telepon (WhatsApp)"
-                name="phoneNumber"
+                name="phone_number"
                 type="text"
                 icon={<Phone className="h-4 w-4" />}
-                error={errors.phoneNumber}
+                error={errors.phone_number}
                 {...inputProps}
               />
               <FormInput
                 label="Nama Ahli Waris"
-                name="heir"
+                name="ahliwaris"
                 icon={<User className="h-4 w-4" />}
-                error={errors.heir}
+                error={errors.ahliwaris}
                 {...inputProps}
               />
             </CardContent>
           </Card>
 
+          {/* Alamat Lengkap Card */}
           <Card className="shadow-2xl">
             <CardHeader>
               <CardTitle className="text-xl flex items-center text-primary">
@@ -215,10 +344,10 @@ const RegistrationForm: React.FC = () => {
                 />
                 <FormInput
                   label="Kode Pos"
-                  name="postalCode"
+                  name="postal_code"
                   type="text"
                   icon={<MapPin className="h-4 w-4" />}
-                  error={errors.postalCode}
+                  error={errors.postal_code}
                   {...inputProps}
                 />
               </div>
@@ -226,13 +355,13 @@ const RegistrationForm: React.FC = () => {
           </Card>
 
           {/* Submit Button */}
-          <div className="flex justify-end pt-4 ">
+          <div className="flex justify-end pt-4">
             <button
               type="submit"
-              disabled={isSubmitting}
-              className="flex cursor-pointer items-center space-x-2 px-6 py-3 text-lg font-bold rounded-xl text-white bg-green-600 hover:bg-green-700 disabled:bg-gray-400 transition-colors shadow-lg transform hover:scale-[1.02] active:scale-100"
+              disabled={loading}
+              className="flex cursor-pointer items-center space-x-2 px-6 py-3 text-lg font-bold rounded-xl text-white bg-green-600 hover:bg-green-700 disabled:bg-gray-400 transition-colors shadow-lg transform hover:scale-[1.02] active:scale-100 disabled:transform-none"
             >
-              {isSubmitting ? (
+              {loading ? (
                 <>
                   <Loader2 className="h-5 w-5 animate-spin" />
                   <span>Mendaftar...</span>
@@ -247,6 +376,18 @@ const RegistrationForm: React.FC = () => {
           </div>
         </form>
       </div>
+
+      {/* Error Modal */}
+      <ErrorModal
+        isOpen={showErrorModal}
+        onClose={closeErrorModal}
+        errorMessage={modalErrorMessage}
+        fieldErrors={fieldErrors}
+        onRetry={handleRetry}
+      />
+
+      {/* Success Modal */}
+      <SuccessModal isOpen={showSuccessModal} onClose={closeSuccessModal} />
     </DashboardLayout>
   );
 };

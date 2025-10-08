@@ -16,16 +16,10 @@ api.interceptors.request.use(
     // Ambil token dari localStorage
     const token = localStorage.getItem("token");
 
-    // Logging untuk debugging
-    console.log("Request config:", config);
-    console.log("Token from localStorage:", token);
-
     // Jika token ada, tambahkan ke header Authorization
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
-      console.log("Authorization header added:", config.headers.Authorization);
     } else {
-      console.log("No token found in localStorage");
     }
 
     return config;
@@ -41,7 +35,7 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => {
     // Logging untuk debugging
-    console.log("Response:", response);
+
     return response;
   },
   (error) => {
@@ -52,7 +46,6 @@ api.interceptors.response.use(
     if (error.response && error.response.status === 401) {
       localStorage.removeItem("token");
       localStorage.removeItem("username"); // Tambahkan ini
-      console.log("Unauthorized, redirecting to login");
       // Redirect ke halaman login
       window.location.href = "/login";
     }

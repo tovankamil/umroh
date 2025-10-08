@@ -95,22 +95,27 @@ def Registrasi(request):
         serializer = UserRegistrasiSerializer(data=request.data)
         if serializer.is_valid():
             # Convert OrderedDict to a standard dictionary
-           # task_data = dict(serializer.validated_data) 
+            task_data = dict(serializer.validated_data) 
             sponsor = CustomUser.objects.get(username=request.data.get('sponsor_username'))
             upline_data = SponsorshipService.get_upline_with_bonus_cached(str(sponsor.id), max_level=3)
-      
+            print(task_data)
             # Pass the standard dictionary to the task
-            #task = create_user_task.delay(task_data)
+            task = create_user_task.delay(task_data)
 
             return success_response(
                 data={
                     'message': 'Registrasi sedang diproses secara asynchronous',
                     # 'task_id': task.id,
-                    'upline': upline_data
+                    'upline': {
+                        'username': sponsor.username,
+                        'name': sponsor.name,
+                        'email': sponsor.email
+                        # Only include simple fields that are JSON serializable
+                    }
                 },
                 status_code=status.HTTP_201_CREATED,
                 message="User successfully created"
-            )
+              )
         else:
             error_messages = []
             for field, errors in serializer.errors.items():
@@ -122,6 +127,11 @@ def Registrasi(request):
                 "errors": error_messages
             }, status=status.HTTP_400_BAD_REQUEST)
             
+    except CustomUser.DoesNotExist:
+        return error_response(
+            message='Sponsor tidak ditemukan',
+            status_code=status.HTTP_400_BAD_REQUEST
+        )
     except Exception as e:
         logger.error(f"Registration error: {str(e)}")
         return error_response(

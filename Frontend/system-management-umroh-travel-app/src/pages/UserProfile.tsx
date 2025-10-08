@@ -123,7 +123,6 @@ const UserProfile: React.FC = () => {
       setUserData(editedData); // Update data utama
       setIsEditing(false);
       setIsSaving(false);
-      console.log("Data profil berhasil disimpan.");
       // Di sini bisa ditambahkan notifikasi sukses
     }, 1500);
   };

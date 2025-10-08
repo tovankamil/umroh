@@ -192,8 +192,6 @@ const Dashboard: React.FC = () => {
     // DashboardLayout akan menyediakan Header dan Sidebar
     <DashboardLayout>
       <div className="w-full space-y-8">
-        <h1 className="text-3xl font-bold text-gray-800">Dashboard Utama</h1>
-
         {/* --- 1. RINGKASAN STATISTIK --- */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {/* Kartu: Total Mitra Bergabung */}

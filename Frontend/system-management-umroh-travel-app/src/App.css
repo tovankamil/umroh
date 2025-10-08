@@ -32,11 +32,26 @@
     animation: logo-spin infinite 20s linear;
   }
 }
-
+body {
+  font-family: "Lexend Deca", sans-serif;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  min-height: 100vh;
+  background-color: #f3f5f9;
+  color: #292d32;
+}
 .card {
   padding: 2em;
 }
 
 .read-the-docs {
   color: #888;
+}
+
+.hide-scrollbar {
+  scrollbar-width: none;
+}
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
 }

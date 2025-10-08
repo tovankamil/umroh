@@ -41,6 +41,10 @@ export const validate = (formData) => {
     newErrors.ktp = "Nomor KTP hanya boleh mengandung angka.";
   }
 
+  if (ktp && ktp.length > 16) {
+    newErrors.ktp = "KTP maksimal 16 karakter.";
+  }
+
   // 4. Phone Number validation (numbers only)
   if (phoneNumber && !numberRegex.test(phoneNumber)) {
     // "Phone number must contain numbers only."
@@ -53,5 +57,10 @@ export const validate = (formData) => {
     newErrors.postalCode = "Kode Pos hanya boleh mengandung angka.";
   }
 
+  if (!formData.email.trim()) {
+    newErrors.email = "Email wajib diisi";
+  } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+    newErrors.email = "Format email tidak valid";
+  }
   return newErrors;
 };
