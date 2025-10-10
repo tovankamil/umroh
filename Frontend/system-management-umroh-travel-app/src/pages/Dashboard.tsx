@@ -291,29 +291,6 @@ const Dashboard: React.FC = () => {
             </CardContent>
           </Card>
         </div>
-
-        {/* --- 3. DETAIL USER (Dari data yang sudah ada) --- */}
-        {/* Konten detail user yang sebelumnya sudah ada (disembunyikan untuk tampilan bersih) */}
-        {/* Hapus atau sisakan div ini sesuai kebutuhan */}
-        {userData && (
-          <div className="bg-white shadow rounded-lg p-6 mt-8">
-            <h2 className="text-xl font-semibold mb-4 text-primary">
-              Detail Profil Anda
-            </h2>
-            <p className="text-sm text-gray-600">
-              Username:{" "}
-              <span className="font-medium text-gray-800">
-                {userData.user.username}
-              </span>
-            </p>
-            <p className="text-sm text-gray-600">
-              Level:{" "}
-              <span className="font-medium text-primary">
-                {userData.user.level_status}
-              </span>
-            </p>
-          </div>
-        )}
       </div>
     </DashboardLayout>
   );

@@ -43,7 +43,10 @@ INSTALLED_APPS = [
      'corsheaders', 
     'users',
     'sponsorships',
-    'wallet'
+    'wallet',
+    'bank',
+    'nasabah',
+    'django_filters'
 ]
 
 MIDDLEWARE = [

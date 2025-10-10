@@ -1,5 +1,6 @@
 from django.urls import path
 from users.views import userlist, user_details,login_view,logout_view,refresh_token_view,not_found,Registrasi
+from bank.views import bank_list, bank_detail
 from rest_framework_simplejwt.views import TokenVerifyView
 
 urlpatterns = [
@@ -17,6 +18,8 @@ urlpatterns = [
     # Reegistration endpoints
     path('v1/registrasi/', Registrasi, name='registration-new-user'),
     
+    path('v1/banks/', bank_list, name='bank-list'),
+    path('v1/banks/<int:pk>/', bank_detail, name='bank-detail'),
     # Not found endpoin
     path('v1/api/<path:undefined>/', not_found, name='not_found'),
 ]

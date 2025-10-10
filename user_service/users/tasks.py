@@ -4,7 +4,7 @@ from django.core.mail import send_mail
 from django.conf import settings
 from django.db import IntegrityError, transaction
 from django.utils import timezone
-
+from nasabah.models import Nasabah
 from sponsorships.models import Sponsorship
 import logging
 from celery.exceptions import MaxRetriesExceededError
@@ -61,6 +61,19 @@ def create_user_task(user_data):
             # Save the user
             user.save()
             
+            try:
+                #create data nasabah
+                nasabah_instance = Nasabah(
+                        user=user,
+                        bank=user_data['bank_id'],
+                        nasabah_name=user_data['nasabah_name'],
+                        account_number=user_data['account_number'],
+                        branch=user_data['branch']
+                    )
+                nasabah_instance.save()
+            except Exception as e:
+                    logger.error(f"Error creating nasabah: {str(e)}")
+                    
             # Create Sponsorship data
             sponsor_username = user_data.get('sponsor_username')
             if sponsor_username:
@@ -77,7 +90,7 @@ def create_user_task(user_data):
                 except Exception as e:
                     logger.error(f"Error creating sponsorship: {str(e)}")
                     # Tidak perlu rollback, sponsorship opsional
-        
+                
         logger.info(f"User {user.username} berhasil dibuat melalui Celery (ID: {user.id})")
   
         return {
@@ -85,7 +98,11 @@ def create_user_task(user_data):
             'username': user.username,
             'email': user.email,
             'alamat': user.address,
-            'ktp':user.ktp
+            'ktp':user.ktp,
+            'bank_id': user_data['bank_id'],
+            'nasabah_name': user_data['nasabah_name'],
+            'account_number': user_data['account_number'],
+            'branch': user_data['branch']
         }
         
     except IntegrityError as e:

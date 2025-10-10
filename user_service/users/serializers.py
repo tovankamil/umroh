@@ -81,7 +81,8 @@ class UserUpdateSerializer(serializers.ModelSerializer):
             model = CustomUser
             fields = ('id', 'username', 'email', 'name', 'phone_number', 'ktp', 
                  'address', 'province', 'city', 'district', 'postal_code', 
-                 'level_status', 'ahliwaris','password')
+                 'level_status', 'ahliwaris','password','bank_id','nasabah_name','account_number','branch')
+            read_only_fields = ('id', 'level_status')
         extra_kwargs = {
             'username': {'validators': []},  # Nonaktifkan validators uniqueness
             'email': {'required': False},
